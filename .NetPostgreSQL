@@ -1,0 +1,56 @@
+dotnet new webapi -o [name] | dotnet new mvc -o [name] | dotnet new webapp -o [name]
+
+dotnet dev-certs https --trust
+
+dotnet tool install --global dotnet-ef
+
+dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
+
+dotnet add package Microsoft.EntityFrameworkCore.Design 
+
+dotnet tool install -g dotnet-aspnet-codegenerator 
+
+En appsetting.json agregar:
+<>
+ "ConnectionStrings": {
+    "constring": "Host=host;Port=port;Database=db;Username=user;Password=pass"
+  }
+</>
+
+dotnet ef dbcontext scaffold "Name=ConnectionStrings:constring" Npgsql.EntityFrameworkCore.PostgreSQL -o Data
+
+En el archivo Context.cs de Models remplazar el siguiente bloque
+<>
+  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+
+        }
+    }
+<>
+En el archivo Program.cs agregar
+
+//Arriba de todo
+using [namespace].Data;
+using Microsoft.EntityFrameworkCore;
+
+//Debajo de los otros builder.Services
+builder.Services.AddDbContext<[youfilecontexinmodels]>(options=>{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("constring"));
+});
+
+//MIGRACIONES
+Agregar modelos a Context.cs
+<>
+public DbSet<Note>Notes{get; set;}
+<>
+
+dotnet ef migrations add InitialCreate | [OtherName]
+
+dotnet ef database update
+
+dotnet ef migrations remove
+
+
+
