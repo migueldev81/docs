@@ -52,5 +52,9 @@ dotnet ef database update
 
 dotnet ef migrations remove
 
+//DbConnect MySQL
+string _GetConnStringName = builder.Configuration.GetConnectionString("DefaultConnectionMySQL");
+builder.Services.AddDbContextPool<DotnetappContext>(options => options.UseMySql(_GetConnStringName, ServerVersion.AutoDetect(_GetConnStringName)));
 
+Pomelo.EntityFrameworkCore.MySql
 
