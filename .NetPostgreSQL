@@ -58,3 +58,19 @@ builder.Services.AddDbContextPool<DotnetappContext>(options => options.UseMySql(
 
 Pomelo.EntityFrameworkCore.MySql
 
+ARQUITECTURA N CAPAS
+
+dotnet new sln -o [name]
+cd [name]
+dotnet new classlib -o Entity
+dotnet new classlib -o DAL
+dotnet new classlib -o BBL
+dotnet new webapi -o API
+
+dotnet sln add Entity
+dotnet sln add DAL
+dotnet sln add BBL
+dotnet sln add API
+
+dotnet add Entity/Entity.csproj reference DAL/DAL.csproj
+
