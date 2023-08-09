@@ -1,58 +1,89 @@
-dotnet new webapi -o [name] | dotnet new mvc -o [name] | dotnet new webapp -o [name]
+1). dotnet new webapi -o [name]
 
-dotnet dev-certs https --trust
+2). dotnet new sln
 
-dotnet tool install --global dotnet-ef
+3). dotnet add add [name].csproj
 
-dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
+4). dotnet dev-certs https --trust
 
-dotnet add package Microsoft.EntityFrameworkCore.Design 
+5). .csproj
+<> 
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>bba7929a-b6ac-4e55-9065-1d18d2ddf83c</UserSecretsId>
+    <BaseOutputPath>bin</BaseOutputPath>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.8">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="7.0.8" >
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
 
-dotnet tool install -g dotnet-aspnet-codegenerator 
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.8">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
 
-En appsetting.json agregar:
+    <PackageReference Include="MimeKit" Version="4.1.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+</Project>
 <>
+
+6). appsettings.json
+<> 
  "ConnectionStrings": {
     "constring": "Host=host;Port=port;Database=db;Username=user;Password=pass"
   }
 </>
 
-dotnet ef dbcontext scaffold "Name=ConnectionStrings:constring" Npgsql.EntityFrameworkCore.PostgreSQL -o Data
+7). dotnet ef dbcontext scaffold "Name=ConnectionStrings:constring" Npgsql.EntityFrameworkCore.PostgreSQL -o Data --force
 
-En el archivo Context.cs de Models remplazar el siguiente bloque
+8). Program.cs
 <>
-  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        if (!optionsBuilder.IsConfigured)
-        {
-
-        }
-    }
-<>
-En el archivo Program.cs agregar
-
-//Arriba de todo
 using [namespace].Data;
 using Microsoft.EntityFrameworkCore;
+<>
 
-//Debajo de los otros builder.Services
-builder.Services.AddDbContext<[youfilecontexinmodels]>(options=>{
+<>
+builder.Services.AddDbContext<[Context]>(options=>{
     options.UseNpgsql(builder.Configuration.GetConnectionString("constring"));
-});
-
-//MIGRACIONES
-Agregar modelos a Context.cs
-<>
-public DbSet<Note>Notes{get; set;}
+}); 
 <>
 
-dotnet ef migrations add InitialCreate | [OtherName]
+9). .dockerignore
+<>
+**/bin/
+**/obj/
+<>
+
+10). Program.cs
+<>
+if (!app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+<>
+
+dotnet ef migrations add InitialCreate
 
 dotnet ef database update
 
 dotnet ef migrations remove
 
-//DbConnect MySQL
+MYSQL CONNECT
+
 string _GetConnStringName = builder.Configuration.GetConnectionString("DefaultConnectionMySQL");
 builder.Services.AddDbContextPool<DotnetappContext>(options => options.UseMySql(_GetConnStringName, ServerVersion.AutoDetect(_GetConnStringName)));
 
