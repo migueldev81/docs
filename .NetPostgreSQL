@@ -2,7 +2,7 @@
 
 2). dotnet new sln
 
-3). dotnet add [name].csproj
+3). dotnet sln [name].sln add ./[name].csproj
 
 4). dotnet dev-certs https --trust
 
